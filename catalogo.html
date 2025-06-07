@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo de Productos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #002ffe 0%, #002ffe 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #002ffe  0%, #1f46f6  100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            padding: 30px;
+        }
+
+        .controls {
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            gap: 20px;
+            margin-bottom: 30px;
+            align-items: center;
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 15px 50px 15px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #002ffe ;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+        }
+
+        .category-filter {
+            position: relative;
+        }
+
+        .category-select {
+            padding: 15px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1rem;
+            background: white;
+            cursor: pointer;
+            min-width: 200px;
+            transition: all 0.3s ease;
+        }
+
+        .category-select:focus {
+            outline: none;
+            border-color: #000000;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .add-btn {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .add-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+        }
+
+        .add-btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .login-section {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .login-form {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .login-input {
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            min-width: 200px;
+        }
+
+        .login-btn {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .logout-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: #dc2626;
+        }
+
+        .admin-status {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .readonly-notice {
+            background: #fef3c7;
+            color: #92400e;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            border: 1px solid #f1f5f9;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background: #f8fafc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #94a3b8;
+            font-size: 3rem;
+        }
+
+        .product-info {
+            padding: 20px;
+        }
+
+        .product-category {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .product-name {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+
+        .product-description {
+            color: #64748b;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .product-price {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #059669;
+            margin-bottom: 15px;
+        }
+
+        .product-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .edit-btn, .delete-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .edit-btn {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .edit-btn:hover {
+            background: #2563eb;
+        }
+
+        .delete-btn {
+            background: #ef4444;
+            color: white;
+        }
+
+        .delete-btn:hover {
+            background: #dc2626;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+        }
+
+        .modal h2 {
+            margin-bottom: 25px;
+            color: #1e293b;
+            font-size: 1.8rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .image-preview {
+            width: 100%;
+            max-height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .modal-actions button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .save-btn {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        .cancel-btn {
+            background: #6b7280;
+            color: white;
+        }
+
+        .save-btn:hover {
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .cancel-btn:hover {
+            background: #4b5563;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #64748b;
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .controls {
+                grid-template-columns: 1fr;
+            }
+            
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .modal-content {
+                width: 95%;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛍️ Mi Catálogo</h1>
+            <p>Gestiona tu inventario de productos de manera fácil y elegante</p>
+        </div>
+
+        <div class="main-content">
+            <!-- Sección de autenticación -->
+            <div class="login-section" id="loginSection">
+                <div id="loginForm" class="login-form">
+                    <h3 style="width: 100%; margin-bottom: 15px;">🔐 Acceso Administrativo</h3>
+                    <input type="password" id="adminPassword" class="login-input" placeholder="Contraseña de administrador">
+                    <button class="login-btn" onclick="checkAdminPassword()">Iniciar Sesión</button>
+                </div>
+                <div id="adminStatus" style="display: none;">
+                    <span class="admin-status">✅ Modo Administrador Activo</span>
+                    <button class="logout-btn" onclick="logout()" style="margin-left: 15px;">Cerrar Sesión</button>
+                </div>
+            </div>
+
+            <!-- Aviso para usuarios no autenticados -->
+            <div id="readonlyNotice" class="readonly-notice">
+                📖 Catálogo en modo solo lectura - Solo el administrador puede agregar/editar productos
+            </div>
+
+            <div class="controls">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Buscar productos...">
+                    <span class="search-icon">🔍</span>
+                </div>
+                
+                <select id="categoryFilter" class="category-select">
+                    <option value="">Todas las categorías</option>
+                    <option value="ropa-hombre">Ropa Hombre</option>
+                    <option value="ropa-mujer">Ropa Mujer</option>
+                    <option value="zapatillas-hombre">Zapatillas Hombre</option>
+                    <option value="zapatillas-mujer">Zapatillas Mujer</option>
+                    <option value="electrónicos">Electrónicos</option>
+                </select>
+                
+                <button class="add-btn" id="addBtn" onclick="openModal()" disabled>
+                    ➕ Agregar Producto
+                </button>
+            </div>
+
+            <div id="productsGrid" class="products-grid">
+                <div class="empty-state">
+                    <div class="empty-state-icon">📦</div>
+                    <h3>No hay productos</h3>
+                    <p>Comienza agregando tu primer producto al catálogo</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para agregar/editar producto -->
+    <div id="productModal" class="modal">
+        <div class="modal-content">
+            <h2 id="modalTitle">Agregar Producto</h2>
+            <form id="productForm">
+                <div class="form-group">
+                    <label for="productName">Nombre del Producto</label>
+                    <input type="text" id="productName" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="productCategory">Categoría</label>
+                    <select id="productCategory" required>
+                        <option value="">Seleccionar categoría</option>
+                        <option value="ropa-hombre">Ropa Hombre</option>
+                        <option value="ropa-mujer">Ropa Mujer</option>
+                        <option value="zapatillas-hombre">Zapatillas Hombre</option>
+                        <option value="zapatillas-mujer">Zapatillas Mujer</option>
+                        <option value="electrónicos">Electrónicos</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="productDescription">Descripción</label>
+                    <textarea id="productDescription" placeholder="Describe tu producto..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="productPrice">Precio ($)</label>
+                    <input type="number" id="productPrice" step="0.01" min="0" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="productImage">Imagen del Producto</label>
+                    <input type="file" id="productImage" accept="image/*">
+                    <img id="imagePreview" class="image-preview" alt="Vista previa">
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="cancel-btn" onclick="closeModal()">Cancelar</button>
+                    <button type="submit" class="save-btn">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let products = [];
+        let editingProductId = null;
+        let isAdminLoggedIn = false;
+        
+        // ⚠️ CAMBIAR ESTA CONTRASEÑA POR UNA SEGURA
+        const ADMIN_PASSWORD = "mitienda2024";
+
+        // Inicializar la aplicación
+        document.addEventListener('DOMContentLoaded', function() {
+            loadProducts();
+            setupEventListeners();
+            updateUIState();
+        });
+
+        function setupEventListeners() {
+            // Búsqueda en tiempo real
+            document.getElementById('searchInput').addEventListener('input', filterProducts);
+            
+            // Filtro por categoría
+            document.getElementById('categoryFilter').addEventListener('change', filterProducts);
+            
+            // Preview de imagen
+            document.getElementById('productImage').addEventListener('change', previewImage);
+            
+            // Envío del formulario
+            document.getElementById('productForm').addEventListener('submit', saveProduct);
+
+            // Enter key en el campo de contraseña
+            document.getElementById('adminPassword').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    checkAdminPassword();
+                }
+            });
+        }
+
+        function checkAdminPassword() {
+            const password = document.getElementById('adminPassword').value;
+            
+            if (password === ADMIN_PASSWORD) {
+                isAdminLoggedIn = true;
+                updateUIState();
+                alert('✅ Acceso concedido! Ahora puedes agregar y editar productos.');
+            } else {
+                alert('❌ Contraseña incorrecta');
+                document.getElementById('adminPassword').value = '';
+            }
+        }
+
+        function logout() {
+            isAdminLoggedIn = false;
+            document.getElementById('adminPassword').value = '';
+            updateUIState();
+            alert('👋 Sesión cerrada. El catálogo está ahora en modo solo lectura.');
+        }
+
+        function updateUIState() {
+            const loginForm = document.getElementById('loginForm');
+            const adminStatus = document.getElementById('adminStatus');
+            const readonlyNotice = document.getElementById('readonlyNotice');
+            const addBtn = document.getElementById('addBtn');
+
+            if (isAdminLoggedIn) {
+                loginForm.style.display = 'none';
+                adminStatus.style.display = 'block';
+                readonlyNotice.style.display = 'none';
+                addBtn.disabled = false;
+            } else {
+                loginForm.style.display = 'flex';
+                adminStatus.style.display = 'none';
+                readonlyNotice.style.display = 'block';
+                addBtn.disabled = true;
+            }
+        }
+
+        function openModal(productId = null) {
+            if (!isAdminLoggedIn) {
+                alert('🔒 Debes iniciar sesión como administrador para realizar esta acción.');
+                return;
+            }
+
+            const modal = document.getElementById('productModal');
+            const title = document.getElementById('modalTitle');
+            const form = document.getElementById('productForm');
+            
+            editingProductId = productId;
+            
+            if (productId) {
+                title.textContent = 'Editar Producto';
+                const product = products.find(p => p.id === productId);
+                fillForm(product);
+            } else {
+                title.textContent = 'Agregar Producto';
+                form.reset();
+                document.getElementById('imagePreview').style.display = 'none';
+            }
+            
+            modal.style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('productModal').style.display = 'none';
+            editingProductId = null;
+        }
+
+        function fillForm(product) {
+            document.getElementById('productName').value = product.name;
+            document.getElementById('productCategory').value = product.category;
+            document.getElementById('productDescription').value = product.description;
+            document.getElementById('productPrice').value = product.price;
+            
+            if (product.image) {
+                const preview = document.getElementById('imagePreview');
+                preview.src = product.image;
+                preview.style.display = 'block';
+            }
+        }
+
+        function previewImage(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('imagePreview');
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function saveProduct(event) {
+            event.preventDefault();
+            
+            if (!isAdminLoggedIn) {
+                alert('🔒 Debes iniciar sesión como administrador para realizar esta acción.');
+                return;
+            }
+            
+            const name = document.getElementById('productName').value;
+            const category = document.getElementById('productCategory').value;
+            const description = document.getElementById('productDescription').value;
+            const price = parseFloat(document.getElementById('productPrice').value);
+            const imageFile = document.getElementById('productImage').files[0];
+            
+            if (editingProductId) {
+                // Editar producto existente
+                const productIndex = products.findIndex(p => p.id === editingProductId);
+                products[productIndex] = {
+                    ...products[productIndex],
+                    name,
+                    category,
+                    description,
+                    price
+                };
+                
+                if (imageFile) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        products[productIndex].image = e.target.result;
+                        saveProducts();
+                        renderProducts();
+                        closeModal();
+                    };
+                    reader.readAsDataURL(imageFile);
+                } else {
+                    saveProducts();
+                    renderProducts();
+                    closeModal();
+                }
+            } else {
+                // Crear nuevo producto
+                const product = {
+                    id: Date.now(),
+                    name,
+                    category,
+                    description,
+                    price,
+                    image: null
+                };
+                
+                if (imageFile) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        product.image = e.target.result;
+                        products.push(product);
+                        saveProducts();
+                        renderProducts();
+                        closeModal();
+                    };
+                    reader.readAsDataURL(imageFile);
+                } else {
+                    products.push(product);
+                    saveProducts();
+                    renderProducts();
+                    closeModal();
+                }
+            }
+        }
+
+        function deleteProduct(productId) {
+            if (!isAdminLoggedIn) {
+                alert('🔒 Debes iniciar sesión como administrador para realizar esta acción.');
+                return;
+            }
+            
+            if (confirm('¿Estás seguro de que quieres eliminar este producto?')) {
+                products = products.filter(p => p.id !== productId);
+                saveProducts();
+                renderProducts();
+            }
+        }
+
+        function filterProducts() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const categoryFilter = document.getElementById('categoryFilter').value;
+            
+            let filteredProducts = products;
+            
+            if (searchTerm) {
+                filteredProducts = filteredProducts.filter(product => 
+                    product.name.toLowerCase().includes(searchTerm) ||
+                    product.description.toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            if (categoryFilter) {
+                filteredProducts = filteredProducts.filter(product => 
+                    product.category === categoryFilter
+                );
+            }
+            
+            renderProducts(filteredProducts);
+        }
+
+        function renderProducts(productsToRender = products) {
+            const grid = document.getElementById('productsGrid');
+            
+            if (productsToRender.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📦</div>
+                        <h3>No hay productos</h3>
+                        <p>Comienza agregando tu primer producto al catálogo</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const actionButtons = isAdminLoggedIn ? 
+                `<div class="product-actions">
+                    <button class="edit-btn" onclick="openModal(PRODUCT_ID)">Editar</button>
+                    <button class="delete-btn" onclick="deleteProduct(PRODUCT_ID)">Eliminar</button>
+                </div>` : '';
+            
+            grid.innerHTML = productsToRender.map(product => `
+                <div class="product-card">
+                    ${product.image ? 
+                        `<img src="${product.image}" alt="${product.name}" class="product-image">` :
+                        `<div class="product-image">📷</div>`
+                    }
+                    <div class="product-info">
+                        <span class="product-category">${getCategoryLabel(product.category)}</span>
+                        <h3 class="product-name">${product.name}</h3>
+                        <p class="product-description">${product.description}</p>
+                        <div class="product-price">${product.price.toFixed(2)}</div>
+                        ${actionButtons.replace(/PRODUCT_ID/g, product.id)}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function getCategoryLabel(category) {
+            const labels = {
+                'ropa-hombre': 'Ropa Hombre',
+                'ropa-mujer': 'Ropa Mujer',
+                'zapatillas-hombre': 'Zapatillas Hombre',
+                'zapatillas-mujer': 'Zapatillas Mujer',
+                'electrónicos': 'Electrónicos'
+            };
+            return labels[category] || category;
+        }
+
+        function saveProducts() {
+            // En un entorno real, esto sería una llamada a una API
+            // Por ahora solo mantenemos en memoria durante la sesión
+        }
+
+        function loadProducts() {
+            // En un entorno real, esto cargaría desde una base de datos
+            // Por ahora comenzamos con un array vacío
+            renderProducts();
+        }
+
+        // Cerrar modal al hacer clic fuera de él
+        document.getElementById('productModal').addEventListener('click', function(event) {
+            if (event.target === this) {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>
